@@ -111,5 +111,5 @@ select:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid 
 }
 
 /* Embedded in a site page: the host page supplies the H1 and the explanation. */
-.embed body{padding-inline:0;padding-block:2px 4px}
+.embed body{padding-inline:12px;padding-block:12px}
 .embed header,.embed .how{display:none}

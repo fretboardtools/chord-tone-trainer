@@ -17,16 +17,19 @@ Import the repo in Vercel. It detects Vite automatically: build command `npm run
 
 ## Embed on the site
 
-Paste into a Custom HTML block. Change the `src` to the Vercel URL.
+The page uses the site's utg-toolpage2 tool-page block. Change the iframe `src` to the Vercel URL.
 
 ```html
-<iframe id="utg-ctt" src="https://chord-tone-trainer.vercel.app/?embed=1" title="Chord Tone Trainer" loading="lazy" allow="autoplay" style="width:100%;height:900px;border:0;display:block"></iframe>
+<!-- The full page block is chord-tone-practice-tool-page.html. The parts that matter: -->
+<div class="utg-toolpage2-embed-frame">
+  <iframe src="https://chord-tone-trainer.vercel.app/?embed=1" title="Chord Tone Trainer" loading="lazy" allow="autoplay"></iframe>
+</div>
 <script>
-window.addEventListener('message',function(e){
-  if(e.data && e.data.type==='utg-tool-height' && e.data.id==='chord-tone-trainer'){
-    document.getElementById('utg-ctt').style.height = e.data.height + 'px';
-  }
-});
+  window.addEventListener("message", function (e) {
+    if (!e.data || e.data.type !== "utg-tool-height" || e.data.id !== "chord-tone-trainer") return;
+    var f = document.querySelector('.utg-toolpage2-embed-frame iframe');
+    if (f) f.style.height = e.data.height + "px";
+  });
 </script>
 ```
 
