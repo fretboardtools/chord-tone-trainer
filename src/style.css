@@ -1,0 +1,115 @@
+/* Layout: one tool column — controls, then the stage (now/next + fretboard), then the chord chart. UTG black/white/grey system. */
+:root{
+  --bg:#f6f6f5; --surface:#ffffff; --fg:#121212; --muted:#646464; --line:#dcdcda;
+  --board:#eeeeec; --win:#dededb; --guide:#5b5b5b; --guide-ink:#ffffff; --ghost:#8c8c8c; --fret:#b9b9b6;
+  --f-display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --f-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d0d0d; --surface:#161616; --fg:#f1f1f1; --muted:#a2a2a2; --line:#2d2d2d;
+  --board:#1a1a1a; --win:#2b2b2b; --guide:#a3a3a3; --guide-ink:#0d0d0d; --ghost:#7c7c7c; --fret:#3d3d3d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d0d0d; --surface:#161616; --fg:#f1f1f1; --muted:#a2a2a2; --line:#2d2d2d;
+  --board:#1a1a1a; --win:#2b2b2b; --guide:#a3a3a3; --guide-ink:#0d0d0d; --ghost:#7c7c7c; --fret:#3d3d3d; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:28px 48px;margin:0}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-display);font-stretch:112%;font-weight:850;font-size:clamp(30px,5vw,46px);line-height:1.02;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.lede{margin:0;max-width:64ch;color:var(--muted)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px}
+.controls{display:grid;grid-template-columns:2fr 1fr 1.2fr 1.6fr;gap:14px;padding:16px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label,.lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+select,input[type=number]{font:inherit;font-size:15px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:8px 10px;width:100%;min-width:0}
+select:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.seg{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.seg button{flex:1;font:inherit;font-size:14px;padding:8px 10px;background:var(--bg);color:var(--fg);border:0;cursor:pointer;white-space:nowrap}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg);font-weight:600}
+.row{display:flex;gap:6px;align-items:stretch}
+.nudge{font:inherit;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:4px;width:38px;cursor:pointer;flex:none}
+
+.transport{display:flex;flex-wrap:wrap;align-items:center;gap:16px 22px;padding:14px 16px}
+.play{font-family:var(--f-display);font-stretch:110%;font-weight:800;font-size:17px;letter-spacing:.02em;background:var(--fg);color:var(--bg);border:0;border-radius:4px;padding:12px 22px;cursor:pointer;display:flex;align-items:center;gap:10px;min-width:122px;justify-content:center}
+.play svg{width:14px;height:14px;fill:currentColor}
+.tempo{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bpm{display:flex;align-items:center;gap:8px}
+.bpm input[type=range]{width:140px;accent-color:var(--fg)}
+.bpm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:14px;min-width:6ch}
+.opts{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-left:auto}
+.chk{display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;user-select:none}
+.chk input{accent-color:var(--fg);width:16px;height:16px}
+.opts select{width:auto;padding:6px 8px;font-size:14px}
+
+.stage{padding:18px 16px 12px;display:flex;flex-direction:column;gap:14px}
+.readout{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:end}
+.now .sym{font-family:var(--f-display);font-stretch:118%;font-weight:900;font-size:clamp(44px,8vw,72px);line-height:.95;letter-spacing:-.01em}
+.now .rn,.next .rn{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.tones{display:flex;flex-wrap:wrap;gap:6px;align-self:end;padding-bottom:6px;min-width:0}
+.tone{font-family:var(--f-mono);font-size:13px;border:1px solid var(--line);border-radius:3px;padding:3px 7px;display:flex;gap:6px}
+.tone b{font-weight:600}
+.tone span{color:var(--muted)}
+.next{text-align:right}
+.next .lbl{display:block}
+.next .sym{font-family:var(--f-display);font-stretch:112%;font-weight:750;font-size:30px;line-height:1;color:var(--muted)}
+.next.soon .sym{color:var(--fg)}
+.meter{display:flex;align-items:center;gap:14px;font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.beats{display:flex;gap:6px}
+.beats i{width:22px;height:8px;border-radius:2px;background:var(--line);display:block}
+.beats i.on{background:var(--fg)}
+.beats.count i.on{background:var(--muted)}
+
+.board-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-inline:-4px;padding-inline:4px}
+#board{display:block;width:100%;min-width:760px;height:auto}
+#board text{font-family:var(--f-mono)}
+/* One persistent dot per string/fret. State lives in classes, so nothing redraws on a beat. */
+.pos{opacity:0}
+.pos .b{fill:var(--board);stroke:none;stroke-width:0}
+.pos text{font-size:10.5px;font-weight:600;text-anchor:middle;dominant-baseline:central;fill:var(--fg)}
+.pos.cur{opacity:1}
+.pos.cur.root .b{fill:var(--fg)} .pos.cur.root text{fill:var(--surface)}
+.pos.cur.third .b,.pos.cur.seventh .b{fill:var(--guide)} .pos.cur.third text,.pos.cur.seventh text{fill:var(--guide-ink)}
+.pos.cur.fifth .b{fill:var(--surface);stroke:var(--fg);stroke-width:2}
+
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted);padding-top:4px;border-top:1px solid var(--line);padding-block:10px 0}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend svg{width:18px;height:18px;flex:none}
+
+.chart-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:14px 16px 0}
+.chart-head h2{font-family:var(--f-display);font-stretch:110%;font-weight:800;font-size:18px;margin:0}
+.chart-head p{margin:0;font-size:13px;color:var(--muted)}
+.chart{display:grid;grid-template-columns:repeat(16,1fr);gap:6px;padding:12px 16px 16px}
+.cell{font:inherit;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:8px 10px 10px;cursor:pointer;color:var(--fg);display:flex;flex-direction:column;gap:2px;min-width:0;position:relative;overflow:hidden}
+.cell .c{font-family:var(--f-display);font-stretch:108%;font-weight:750;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell .r{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.cell .p{position:absolute;left:0;bottom:0;height:3px;background:var(--fg);width:0}
+.cell.cur{border-color:var(--fg)}
+.cell:disabled{cursor:default}
+
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:16px}
+.how h3{font-family:var(--f-display);font-stretch:108%;font-weight:750;font-size:15px;margin:0 0 4px}
+.how p{margin:0;font-size:14px;color:var(--muted);max-width:40ch}
+
+@media (max-width:860px){
+  .controls{grid-template-columns:1fr 1fr}
+  .opts{margin-left:0}
+  .how{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .controls{grid-template-columns:1fr}
+  .readout{grid-template-columns:1fr auto}
+  .tones{grid-column:1/-1;order:3}
+  .chart{grid-template-columns:repeat(8,1fr)}
+  .bpm input[type=range]{width:110px}
+}
+
+/* Embedded in a site page: the host page supplies the H1 and the explanation. */
+.embed body{padding-inline:0;padding-block:2px 4px}
+.embed header,.embed .how{display:none}

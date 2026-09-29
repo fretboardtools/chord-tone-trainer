@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chord Tone Trainer | Unlock the Guitar</title>
+<meta name="description" content="Free chord tone practice tool for guitar. Pick a progression, a key and an area of the neck, and see the chord tones in time as the chords play.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/src/style.css">
+<script>
+  // Embed mode and theme are set before first paint so the page never flashes the wrong look.
+  (function(){
+    var p=new URLSearchParams(location.search), inFrame=false;
+    try{ inFrame = window.self!==window.top; }catch(e){ inFrame=true; }
+    var embed = inFrame || p.has('embed');
+    if(embed) document.documentElement.classList.add('embed');
+    var theme = p.get('theme') || (embed ? 'light' : null);   // embedded: light unless ?theme=dark
+    if(theme==='light'||theme==='dark') document.documentElement.setAttribute('data-theme',theme);
+  })();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">unlocktheguitar.net · Free tool</div>
+    <h1>Chord Tone Trainer</h1>
+    <p class="lede">Pick a progression, a key and an area of the neck. Press play and the chord tones light up in time with the changes, so you can hear each chord and see where its notes are while you play.</p>
+  </header>
+
+  <section class="panel controls" aria-label="Settings">
+    <div class="field">
+      <label for="prog">Progression</label>
+      <select id="prog"></select>
+    </div>
+    <div class="field">
+      <label for="key">Key</label>
+      <select id="key"></select>
+    </div>
+    <div class="field">
+      <span class="lbl" id="typeLbl">Chords</span>
+      <div class="seg" role="group" aria-labelledby="typeLbl">
+        <button type="button" id="t7" data-type="7">7th chords</button>
+        <button type="button" id="t3" data-type="3">Triads</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="win">Neck area</label>
+      <div class="row">
+        <button type="button" class="nudge" id="winDown" aria-label="Move down the neck">&#8592;</button>
+        <select id="win"></select>
+        <button type="button" class="nudge" id="winUp" aria-label="Move up the neck">&#8594;</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel transport" aria-label="Playback">
+    <button type="button" class="play" id="play"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 1l11 6-11 6z"/></svg><span>Play</span></button>
+    <div class="tempo">
+      <div class="seg" role="group" aria-label="Tempo presets">
+        <button type="button" data-bpm="60">Slow</button>
+        <button type="button" data-bpm="90">Medium</button>
+        <button type="button" data-bpm="120">Fast</button>
+      </div>
+      <div class="bpm">
+        <input type="range" id="bpm" min="40" max="200" step="1" aria-label="Tempo in beats per minute">
+        <output id="bpmOut" for="bpm"></output>
+      </div>
+    </div>
+    <div class="opts">
+      <label class="chk"><input type="checkbox" id="countIn"> Count-in</label>
+      <label class="chk"><input type="checkbox" id="click"> Click</label>
+      <label class="chk">Sound <select id="voice" aria-label="Backing sound">
+        <option value="epiano">Electric piano</option><option value="pad">Warm pad</option><option value="clean">Clean electric</option><option value="acoustic">Acoustic</option><option value="off">Off</option>
+      </select></label>
+      <label class="chk">Switch dots <select id="lead" aria-label="When the dots switch to the next chord">
+        <option value="0">On the change</option><option value="0.5">Half a beat early</option><option value="1">One beat early</option>
+      </select></label>
+      <label class="chk">Labels <select id="labels" aria-label="Dot labels">
+        <option value="int">Intervals</option><option value="note">Note names</option>
+      </select></label>
+    </div>
+  </section>
+
+  <section class="panel stage" aria-label="Fretboard">
+    <div class="readout">
+      <div class="now"><div class="sym" id="nowSym">A7</div><div class="rn" id="nowRn">I7</div></div>
+      <div class="tones" id="tones"></div>
+      <div class="next" id="nextBox"><span class="lbl">Next</span><div class="sym" id="nextSym">D7</div><div class="rn" id="nextRn">IV7</div></div>
+    </div>
+    <div class="meter"><div class="beats" id="beats"><i></i><i></i><i></i><i></i></div><span id="barPos">Bar 1 of 12</span></div>
+    <div class="board-scroll" id="scroller"><svg id="board" viewBox="0 0 1000 226" role="img" aria-label="Guitar fretboard showing chord tones"></svg></div>
+    <div class="legend" aria-label="Key to the dots">
+      <span><svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="var(--fg)"/></svg>Root</span>
+      <span><svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="var(--guide)"/></svg>3rd and 7th</span>
+      <span><svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="var(--surface)" stroke="var(--fg)" stroke-width="2"/></svg>5th</span>
+    </div>
+  </section>
+
+  <section class="panel" aria-label="Chord chart">
+    <div class="chart-head"><h2 id="chartTitle">12-bar blues in A</h2><p id="chartHint">Tap a chord to see its tones.</p></div>
+    <div class="chart" id="chart"></div>
+  </section>
+
+  <section class="panel how" aria-label="How to use it">
+    <div><h3>Stay in one area</h3><p>Pick a five-fret area and keep your hand there. The point is to find the next chord's notes without jumping around the neck.</p></div>
+    <div><h3>Aim at the change</h3><p>The dots switch to the next chord half a beat before it arrives, so you can see where you're going in time to get there. Make it a full beat early if you need more warning.</p></div>
+    <div><h3>Then stop looking</h3><p>Once a progression feels familiar, switch the dots to On the change, then try it with your eyes closed. The dots are there to get you started.</p></div>
+  </section>
+</div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
